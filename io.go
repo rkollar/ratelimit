@@ -59,5 +59,5 @@ func min(a int, b int) int {
 }
 
 func capacityFromRate(rate int64) int64 {
-	return rate * 6
+	return rate * 3
 }
