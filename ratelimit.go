@@ -11,7 +11,7 @@ type Bucket struct {
 	avail    int64
 }
 
-func NewBucketWithRate(rate int64, capacity int64) *Bucket {
+func NewBucket(rate int64, capacity int64) *Bucket {
 	b := &Bucket{
 		ts:    time.Now().Round(1 * time.Millisecond),
 		avail: capacity,
