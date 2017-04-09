@@ -25,11 +25,11 @@ func (self *Bucket) Set(rate int64, capacity int64) {
 	if rate <= 0 {
 		panic("rate <= 0")
 	}
-	if rate < 1000 {
-		panic("rate < 1000")
-	}
 	if capacity <= 0 {
 		panic("capacity <= 0")
+	}
+	if rate < 1000 {
+		rate = 1000
 	}
 	self.rate = int64(float64(rate) / 1000)
 	self.capacity = capacity
