@@ -1,6 +1,7 @@
 package ratelimit
 
 import (
+	"math"
 	"time"
 )
 
@@ -58,7 +59,8 @@ func (self *Bucket) Wait(count int64) {
 	// we need to wait
 	count -= self.avail
 	self.avail = 0
-	dur := time.Duration((float64(count) / float64(self.rate))) * time.Millisecond
+
+	dur := time.Duration(math.Ceil(float64(count)/float64(self.rate))) * time.Millisecond
 	if dur < 1*time.Millisecond {
 		dur = 1 * time.Millisecond
 	}
