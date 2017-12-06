@@ -34,6 +34,9 @@ func (self *Bucket) Set(rate int64, capacity int64) {
 	}
 	self.rate = int64(float64(rate) / 1000)
 	self.capacity = capacity
+	if self.avail > self.capacity {
+		self.avail = self.capacity
+	}
 }
 
 func (self *Bucket) Wait(count int64) {
