@@ -41,6 +41,9 @@ func (self *Writer) SetLimits(rate int64, capacity int64) {
 }
 
 func (self *Writer) SetMaxChunkSize(s int) {
+	if s <= 0 {
+		panic("max chunk size <= 0")
+	}
 	self.maxChunkSize = s
 }
 
