@@ -19,13 +19,22 @@ func NewWriter(w io.Writer, maxChunkSize int, rate int64, capacity int64) *Write
 }
 
 func (self *Writer) Write(p []byte) (n int, err error) {
-	if len(p) > self.maxChunkSize {
-		p = p[:self.maxChunkSize]
+	var ns int
+	var s []byte
+
+	for pos := 0; pos < len(p); pos += self.maxChunkSize {
+		s = p[pos:min(len(p), pos+self.maxChunkSize)]
+
+		self.bucket.Wait(int64(len(s)))
+
+		ns, err = self.w.Write(s)
+		n += ns
+		if err != nil {
+			return
+		}
 	}
 
-	self.bucket.Wait(int64(len(p)))
-
-	return self.w.Write(p)
+	return
 }
 
 func (self *Writer) Close() error {
