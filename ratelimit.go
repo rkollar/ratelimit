@@ -24,6 +24,17 @@ func NewBucket(rate int64, capacity int64) *Bucket {
 	return b
 }
 
+func (self *Bucket) refill(now time.Time) {
+	since := now.Sub(self.ts)
+	diff := int64(since / resolution)
+
+	self.avail += diff * self.rate
+	if self.avail > self.capacity {
+		self.avail = self.capacity
+	}
+	self.ts = self.ts.Add(time.Duration(diff) * resolution)
+}
+
 func (self *Bucket) Set(rate int64, capacity int64) {
 	if rate <= 0 {
 		panic("rate <= 0")
@@ -48,7 +59,7 @@ func (self *Bucket) Wait(count int64) {
 		return
 	}
 
-	// we need to wait
+	// use what we can and wait for the rest
 	count -= self.avail
 	self.Use(self.avail)
 
@@ -68,14 +79,7 @@ func (self *Bucket) Use(count int64) bool {
 		return true
 	}
 
-	// refill the bucket
-	since := time.Since(self.ts)
-	diff := int64(since / resolution)
-	self.avail += diff * self.rate
-	if self.avail > self.capacity {
-		self.avail = self.capacity
-	}
-	self.ts = self.ts.Add(time.Duration(diff) * resolution)
+	self.refill(time.Now())
 
 	// re-check
 	if count <= self.avail {
