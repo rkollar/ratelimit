@@ -43,9 +43,29 @@ func (self *Bucket) Set(rate int64, capacity int64) {
 }
 
 func (self *Bucket) Wait(count int64) {
+	enough := self.Use(count)
+	if enough {
+		return
+	}
+
+	// we need to wait
+	count -= self.avail
+	self.Use(self.avail)
+
+	dur := time.Duration(math.Ceil(float64(count)/float64(self.rate))) * resolution
+	if dur < resolution {
+		dur = resolution
+	}
+
+	time.Sleep(dur)
+
+	self.Wait(count)
+}
+
+func (self *Bucket) Use(count int64) bool {
 	if count <= self.avail {
 		self.avail -= count
-		return
+		return true
 	}
 
 	// refill the bucket
@@ -60,19 +80,17 @@ func (self *Bucket) Wait(count int64) {
 	// re-check
 	if count <= self.avail {
 		self.avail -= count
-		return
+		return true
 	}
 
-	// we need to wait
-	count -= self.avail
-	self.avail = 0
+	return false
+}
 
-	dur := time.Duration(math.Ceil(float64(count)/float64(self.rate))) * resolution
-	if dur < resolution {
-		dur = resolution
+func (self *Bucket) Check(count int64) bool {
+	if count <= self.avail {
+		return true
 	}
-	time.Sleep(dur)
-	self.Wait(count)
+	return false
 }
 
 func (self *Bucket) Fill() {
