@@ -81,7 +81,6 @@ func (self *Bucket) Use(count int64) bool {
 
 	self.refill(time.Now())
 
-	// re-check
 	if count <= self.avail {
 		self.avail -= count
 		return true
@@ -94,6 +93,13 @@ func (self *Bucket) Check(count int64) bool {
 	if count <= self.avail {
 		return true
 	}
+
+	self.refill(time.Now())
+
+	if count <= self.avail {
+		return true
+	}
+
 	return false
 }
 
