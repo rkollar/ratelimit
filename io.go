@@ -56,8 +56,11 @@ func (self *Writer) SetMaxChunkSize(s int) {
 	self.maxChunkSize = s
 }
 
-func (self *Writer) FillBucket() {
-	self.bucket.Fill()
+func (self *Writer) BucketFillMax() {
+	self.bucket.FillMax()
+}
+func (self *Writer) BucketFill(val int64) {
+	self.bucket.Fill(val)
 }
 
 func min(a int, b int) int {

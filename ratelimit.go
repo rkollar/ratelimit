@@ -17,7 +17,7 @@ type Bucket struct {
 func NewBucket(rate int64, capacity int64) *Bucket {
 	b := &Bucket{
 		ts:    time.Now().Round(resolution),
-		avail: capacity,
+		avail: 0,
 	}
 	b.Set(rate, capacity)
 
@@ -103,6 +103,9 @@ func (self *Bucket) Check(count int64) bool {
 	return false
 }
 
-func (self *Bucket) Fill() {
+func (self *Bucket) FillMax() {
 	self.avail = self.capacity
+}
+func (self *Bucket) Fill(val int64) {
+	self.avail = val
 }
